@@ -1,0 +1,18 @@
+var config = {};
+
+config.AUTH = '';
+config.USERID = '';
+config.ROOMID = '';
+config.MASTERID = '';
+config.MINTOADDTOPL = 90;
+
+config.MYSQL_USER = '';
+config.MYSQL_PASS = '';
+config.MYSQL_DB = '';
+
+config.TWITTERCONSUMERKEY = '';
+config.TWITTERCONSUMERSECRET = '';
+config.TWITTERACCESSTOKEN = '';
+config.TWITTERACCESSTOKENSECRET = '';
+
+exports.config = config;
