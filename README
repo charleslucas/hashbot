@@ -1,0 +1,8 @@
+Basic start-up information:
+
+Take the config.js.default file and rename it to config.js.  Update the default values to the proper values for your bot.
+
+To figure out your AUTH, USERID and ROOMID, please follow the directions from the Turntable API Wiki:
+https://github.com/alaingilbert/Turntable-API/wiki/How-to-find-the:-auth,-userid-and-roomid
+
+To figure out the TWITTER* config settings, uhm, I don't remember.  I will try to find the instructions I used originally or just redo the process and write it up.
