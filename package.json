@@ -1,0 +1,25 @@
+{
+  "author": "Gabriel Preston <gpreston@gmail.com> (http://www.morethanawesome.com/)",
+  "name": "hashbot",
+  "description": "A turntable.fm bot written on top of the Turntable API",
+  "keywords": ["turntable.fm", "turntable", "bot"],
+  "version": "0.0.2",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:gabrielpreston/hashbot.git"
+  },
+  "main": "hashbot.js",
+  "scripts": {
+    "start": "./hashbot.js"
+  },
+  "engines": {
+    "node": ">= v0.4.0"
+  },
+  "dependencies": {
+    "ttapi": ">= v1.0.8",
+	"mysql": ">= v0.9.4",
+	"oauth": ">= v0.9.5",
+	"timeago": ">= v0.0.2"
+  },
+  "devDependencies": {}
+}
