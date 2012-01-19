@@ -15,4 +15,6 @@ config.TWITTERCONSUMERSECRET = '';
 config.TWITTERACCESSTOKEN = '';
 config.TWITTERACCESSTOKENSECRET = '';
 
+config.DEFAULTSKIN = 0;
+
 exports.config = config;

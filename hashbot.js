@@ -79,10 +79,12 @@ function commandDj(data) {
 	}
 }
 
+// Currently no way exists to tell if an avatar change was successful, or if you passed a value the user can't switch to yet
 function commandSkin(data) {
 	if (data.userid == config.MASTERID || contains(moderatorsList, data.userid)) {
 		var option = data.text.split(" ", 2)[1];
 		if (option.match(/[0-9]+/)) {
+	   log('!skin command given by master user:' + config.MASTERID + 'to set option ' + option + '.');
 			bot.setAvatar(option);
 		}
 	}
@@ -324,6 +326,12 @@ oAuth = new OAuth("https://api.twitter.com/oauth/request_token", "https://api.tw
 
 // Set up a small interface to allow me to interact with users through the bot
 bot.tcpListen(8080, '127.0.0.1');
+
+// Runs once after bot initializes
+bot.on('ready', function(data) {
+	log('Setting default skin to ' + config.DEFAULTSKIN + '.');
+	bot.setAvatar(config.DEFAULTSKIN);
+	});
 
 bot.on('tcpConnect', function(socket) {
 	tcpUser = 1;

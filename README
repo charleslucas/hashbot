@@ -5,4 +5,21 @@ Take the config.js.default file and rename it to config.js.  Update the default 
 To figure out your AUTH, USERID and ROOMID, please follow the directions from the Turntable API Wiki:
 https://github.com/alaingilbert/Turntable-API/wiki/How-to-find-the:-auth,-userid-and-roomid
 
-To figure out the TWITTER* config settings, uhm, I don't remember.  I will try to find the instructions I used originally or just redo the process and write it up.
+
+
+To figure out the TWITTER* config settings:
+Create a twitter account
+Register a twitter application through dev.twitter.com
+Make sure the application has read/write/direct message access
+Generate the Consumer Key and Consumer Secret
+
+Install node.js
+
+Install mysql
+Create a new hashbot table
+Create a table with fields 'songs','users','last_seen'
+
+Commands with variable types I used to create the tables in the 'hashbot' database:
+CREATE TABLE songs (id TEXT, room_id TEXT, awesomes MEDIUMINT, lames MEDIUMINT, snags MEDIUMINT, playcount MEDIUMINT);
+CREATE TABLE last_seen (user_id TEXT, room_id TEXT, timestamp TIMESTAMP);
+CREATE TABLE users (id TEXT, name TEXT);
