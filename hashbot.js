@@ -184,14 +184,31 @@ function commandSeen(data) {
 	});
 }
 
+function commandTweet(data) {
+	if (data.userid == config.MASTERID || contains(moderatorsList, data.userid)) {
+		var option = data.text.slice(data.text.indexOf(' ')).trim();
+		if (option.match(/^song$/i)) {
+			var tag = '#nowplaying';
+			var tweet = currentDj.name + ' is playing: ' + currentSong.artist + ' - ' + currentSong.song;
+			if (tweet.length + (tag.length + 1) > 140) {
+				tweet = tweet.substring(0, (tweet.length - (tweet.length + (tag.length + 1) - 140)));
+			}
+			sendTweet(tweet + ' ' + tag);
+		}
+		else {
+			sendTweet(option);
+		}
+	}
+}
+
 function sendTweet(data) {
-	log('Sending tweet: "' + data + '".');
+	log('Sending tweet: "' + data + " " + tag + '".');
 	var tag = '#nowplaying';
 	if (data.length + (tag.length + 1) > 140) {
 		data = data.substring(0, (data.length - (data.length + (tag.length + 1) - 140)));
 	}
 	oAuth.post("http://api.twitter.com/1/statuses/update.json", config.TWITTERACCESSTOKEN, config.TWITTERACCESSTOKENSECRET, {
-		"status": data + " #nowplaying"
+		"status": data
 	},
 	function(error, data) {
 		if (error) {
@@ -203,13 +220,9 @@ function sendTweet(data) {
 	});
 }
 
-function log(data, relay) {
-	relay = (typeof relay == 'undefined') ? false: relay;
+function log(data) {
 	var timestamp = new Date();
 	console.log(timestamp, data);
-	if (relay) {
-		sendTweet(data);
-	}
 }
 
 function connect_datasource() {
@@ -306,7 +319,7 @@ function newSong(data, roomchange) {
 		conn.destroy();
 	});
 	var dj_id = data.room.metadata.current_dj;
-	log(usersList[dj_id].name + ' started playing: ' + song.artist + ' - ' + song.song, (dj_id != config.USERID ? true: false));
+	log(usersList[dj_id].name + ' started playing: ' + song.artist + ' - ' + song.song);
 	djsList[dj_id].playCount += 1;
 	currentDj = djsList[dj_id];
 }
@@ -382,7 +395,7 @@ bot.on('roomChanged', function(data) {
 
 	currentRoom = data.room.roomid;
 
-	log('I joined a new room - http://turntable.fm/' + data.room.shortcut, true);
+	log('I joined a new room - http://turntable.fm/' + data.room.shortcut);
 	// log(data);
 	// Build the users list
 	for (var i = 0; i < data.users.length; i++) {
@@ -404,7 +417,7 @@ bot.on('roomChanged', function(data) {
 		ruleLame = 0;
 	}
 
-	newSong(data, true);
+	newSong(data);
 	upvoteCheck(data);
 });
 
@@ -457,6 +470,9 @@ bot.on('speak', function(data) {
 	}
 	else if (data.text.match(/^!dj .*/i)) {
 		commandDj(data);
+	}
+	else if (data.text.match(/^!tweet .*/i)) {
+		commandTweet(data);
 	}
    // Matching for various non-command things said in the channel.
 	else if (data.text.match(mynameRegex)) {
