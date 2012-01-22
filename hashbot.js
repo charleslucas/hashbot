@@ -84,10 +84,17 @@ function commandSkin(data) {
 	if (data.userid == config.MASTERID || contains(moderatorsList, data.userid)) {
 		var option = data.text.split(" ", 2)[1];
 		if (option.match(/[0-9]+/)) {
-	   log('!skin command given by master user:' + config.MASTERID + 'to set option ' + option + '.');
+	   log('!skin command given by master user:' + data.userid + 'to set option ' + option + '.');
 			bot.setAvatar(option);
 		}
 	}
+}
+
+// Currently no way exists to tell if an avatar change was successful, or if you passed a value the user can't switch to yet
+function commandRandomSkin(data) {
+   var randomnumber = Math.floor(Math.random()*(config.MAXSKINVALUE+1));
+	log('!rskin command given by:' + data.userid + ', switching to random option ' + randomnumber + '.');
+	bot.setAvatar(randomnumber);
 }
 
 function commandSetname(data) {
@@ -178,6 +185,7 @@ function commandSeen(data) {
 }
 
 function sendTweet(data) {
+	log('Sending tweet: "' + data + '".');
 	var tag = '#nowplaying';
 	if (data.length + (tag.length + 1) > 140) {
 		data = data.substring(0, (data.length - (data.length + (tag.length + 1) - 140)));
@@ -233,7 +241,7 @@ function updateLastSeen(data) {
 	if (currentRoom == null || data.userid == config.USERID) {
 		return;
 	}
-	log('Updating user last seen for: ' + data.name);
+	log('Updating user-last-seen for: ' + data.name);
 	var conn = connect_datasource();
 	conn.query('REPLACE INTO last_seen (user_id,room_id,timestamp) VALUES (?,?,?)', [
 	data.userid, currentRoom, new Date()]).on('end', function() {
@@ -418,7 +426,13 @@ bot.on('deregistered', function(data) {
 });
 
 bot.on('speak', function(data) {
+	var mynameRegex = new RegExp("^" + config.MYNAME, "ig");
 	usersList[data.userid].lastActivity = new Date();
+	// Don't match on things we said ourselves	
+	if (data.userid == config.USERID) {
+	   return false;		
+	}
+	
 	log(data.name + ' said: ' + data.text);
 	if (tcpUser) {
 		tcpSocket.write('>> ' + data.name + ' said: ' + data.text + '\n');
@@ -428,6 +442,9 @@ bot.on('speak', function(data) {
 	}
 	else if (data.text.match(/^!skin [A-Za-z0-9]+/i)) {
 		commandSkin(data);
+	}
+	else if (data.text.match(/^!rskin.*/i)) {
+		commandRandomSkin(data);
 	}
 	else if (data.text.match(/^!name [A-Za-z0-9]+/i)) {
 		commandSetname(data);
@@ -441,6 +458,26 @@ bot.on('speak', function(data) {
 	else if (data.text.match(/^!dj .*/i)) {
 		commandDj(data);
 	}
+   // Matching for various non-command things said in the channel.
+	else if (data.text.match(mynameRegex)) {
+	  if (data.text.match(/^Hello.*/i)) {
+	    bot.speak('Hello ' + data.name + '!');
+	  }
+	  else if (data.text.match(/^Hey.*/i)) {
+	    bot.speak('Hey ' + data.name + '!');
+	  }
+	  else if (data.text.match(/^Hi.*/i)) {
+	    bot.speak('Hi ' + data.name + '!');
+	  }
+	  else if (data.text.match(/are you a bot.*/i)) {
+	    bot.speak('Yep, I am.  Dumb as toast, and almost as bright!');
+	  }
+	  else {
+	    bot.speak('Huh?');
+	  }
+	}
+	
+	return true;
 });
 
 bot.on('update_votes', function(data) {
