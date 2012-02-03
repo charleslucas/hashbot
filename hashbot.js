@@ -341,6 +341,22 @@ function upvoteCheck(data) {
 	}
 }
 
+// Provide for the bot to say random stuff on occasion
+function randomComment() {
+	// Random number between 0 and 99
+	var commentNum = Math.floor(Math.random()*100)
+   log('Random Comment #' + commentNum)
+	if (commentNum < 3) {
+		bot.speak('On on!');
+	}
+	else if ((commentNum == 4) || (commentNum == 5)) {
+		bot.speak('Boob Check!');
+	}
+	else if (commentNum == 6) {
+		bot.speak('Beer Near!');
+	}
+}
+
 console.log("STARTING UP!");
 
 oAuth = new OAuth("https://api.twitter.com/oauth/request_token", "https://api.twitter.com/oauth/access_token", config.TWITTERCONSUMERKEY, config.TWITTERCONSUMERSECRET, "1.0A", null, "HMAC-SHA1");
@@ -439,17 +455,23 @@ bot.on('deregistered', function(data) {
 });
 
 bot.on('speak', function(data) {
-	var mynameRegex = new RegExp("^" + config.MYNAME, "ig");
+	// Create a regex string so we can match on our own name
+	var mynameRegex = new RegExp(config.MYNAME, "ig");
+	
 	usersList[data.userid].lastActivity = new Date();
-	// Don't match on things we said ourselves	
+
+	// Check so we don't match on things we said ourselves	
 	if (data.userid == config.USERID) {
 	   return false;		
 	}
 	
+	// Otherwise, log what other people say in the channel.
 	log(data.name + ' said: ' + data.text);
 	if (tcpUser) {
 		tcpSocket.write('>> ' + data.name + ' said: ' + data.text + '\n');
 	}
+
+   // Check for commands given in the channel
 	if (data.text.match(/^!lame [A-Za-z]+/i)) {
 		commandLame(data);
 	}
@@ -475,6 +497,10 @@ bot.on('speak', function(data) {
 		commandTweet(data);
 	}
    // Matching for various non-command things said in the channel.
+//	else if (data.text.match(/On on/ig)) {
+//	    bot.speak('On on!');
+//	 }
+   // Matching for non-command things said directly to us
 	else if (data.text.match(mynameRegex)) {
 	  if (data.text.match(/^Hello.*/i)) {
 	    bot.speak('Hello ' + data.name + '!');
@@ -560,5 +586,6 @@ bot.on('newsong', function(data) {
 	// Retrieve current playing song info
 	log('Someone started playing a song.');
 	newSong(data);
+	randomComment();
 });
 
