@@ -3,7 +3,7 @@
   "name": "hashbot",
   "description": "A turntable.fm bot written on top of the Turntable API",
   "keywords": ["turntable.fm", "turntable", "bot"],
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repository": {
     "type": "git",
     "url": "git@github.com:gabrielpreston/hashbot.git"
