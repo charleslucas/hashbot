@@ -184,6 +184,15 @@ function commandSeen(data) {
 	});
 }
 
+function commandRules(data, user) {
+   if (user) {
+		bot.speak(user.name + ', I haven\'t seen you in this channel before, here are the rules: ' + config.CHANNELRULES);
+	}
+	else {
+   		bot.speak('Channel rules:  ' + config.CHANNELRULES);
+	}
+}
+
 function commandTweet(data) {
 	if (data.userid == config.MASTERID || contains(moderatorsList, data.userid)) {
 		var option = data.text.slice(data.text.indexOf(' ')).trim();
@@ -349,12 +358,36 @@ function randomComment() {
 	if (commentNum < 3) {
 		bot.speak('On on!');
 	}
-	else if ((commentNum == 4) || (commentNum == 5)) {
+	else if (commentNum == 4) {
 		bot.speak('Boob Check!');
 	}
-	else if (commentNum == 6) {
+	else if (commentNum == 5) {
 		bot.speak('Beer Near!');
 	}
+	else if (commentNum == 6) {
+	  dateToday = new Date();
+	  if (dateToday.getDay() == 1) {
+			bot.speak('Today is Monday! Monday is a wanking day! Is everybody happy?');
+	  	}
+	  else if (dateToday.getDay() == 2) {
+			bot.speak('Today is Tuesday! Tuesday is two-finger day! Is everybody happy?');
+	  	}
+	  else if (dateToday.getDay() == 3) {
+			bot.speak('Today is Wednesday! Wednesday is a hashing day! Is everybody happy?');
+	  	}
+	  else if (dateToday.getDay() == 4) {
+			bot.speak('Today is Thursday! Thursday is a http://coedmagazine.files.wordpress.com/2011/03/girl-obscene-gesture-tongue-between-fingers-vikavalter-vetta.jpg day! Is everybody happy?');
+	  	}
+	  else if (dateToday.getDay() == 5) {
+			bot.speak('Today is Friday! Friday is a fucking day! Is everybody happy?');
+	  	}
+	  else if (dateToday.getDay() == 6) {
+			bot.speak('Today is Saturday! Saturday is a drinking day! Is everybody happy?');
+	  	}
+	  else if (dateToday.getDay() == 0) {
+			bot.speak('Today is Sunday! Sunday is a day of rest. Is everybody happy?');
+	  	}
+	  } // End if (commentNum == 6)
 }
 
 console.log("STARTING UP!");
@@ -443,6 +476,23 @@ bot.on('registered', function(data) {
 	user.lastActivity = new Date();
 	usersList[user.userid] = user;
 	log(user.name + ' entered the room.');
+   // Determine if we've seen this user before
+//   	var option = data.text.split(" ", 2)[1];
+   if (user.name != config.MYNAME) {
+		var conn = connect_datasource();
+//		conn.query('SELECT users.id AS id,users.name AS name FROM users JOIN last_seen ON users.name LIKE ? AND last_seen.user_id=users.id AND last_seen.room_id=?', ['%' + option + '%', currentRoom], function selectCb(err, results, fields) {
+		conn.query('SELECT users.id AS id,users.name AS name FROM users JOIN last_seen ON users.name LIKE ? AND last_seen.user_id=users.id AND last_seen.room_id=?', ['%%', currentRoom], function selectCb(err, results, fields) {
+			if (err) {
+				throw err;
+			}
+			if (results.length == 0) {
+				log('I have never seen user ' + user.name + ' in this room before, displaying rules:');
+				commandRules(data, user);
+			}
+		}).on('end', function() {
+			conn.destroy();
+		});
+	}
 	updateLastSeen(user);
 });
 
@@ -496,6 +546,9 @@ bot.on('speak', function(data) {
 	else if (data.text.match(/^!tweet .*/i)) {
 		commandTweet(data);
 	}
+	else if (data.text.match(/^!rules.*/i)) {
+		commandRules(data);
+	}
    // Matching for various non-command things said in the channel.
 //	else if (data.text.match(/On on/ig)) {
 //	    bot.speak('On on!');
@@ -523,8 +576,10 @@ bot.on('speak', function(data) {
 });
 
 bot.on('update_votes', function(data) {
+	log('update_votes triggered.');
 	var votelog = data.room.metadata.votelog;
 	for (var i = 0; i < votelog.length; i++) {
+	log('User ' + votelog[i][0] + ' voted ' + votelog[i][1] + '.');
 		var userid = votelog[i][0];
 		if (userid != '') {
 			usersList[userid].lastActivity = new Date();
@@ -535,7 +590,7 @@ bot.on('update_votes', function(data) {
 				bot.speak('Hey! No laming, ' + usersList[userid].name + '!');
 			}
 			else {
-				bot.speak('Hey! No laming! Follow the rules!');
+				bot.speak('Hey! No laming! Follow the rules! (type !rules)');
 			}
 		}
 		updateSongVotes(data.room.metadata.upvotes - currentSong.CurrentAwesomes, data.room.metadata.downvotes - currentSong.CurrentLames);
@@ -588,4 +643,3 @@ bot.on('newsong', function(data) {
 	newSong(data);
 	randomComment();
 });
-
