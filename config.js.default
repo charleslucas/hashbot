@@ -16,5 +16,14 @@ config.TWITTERACCESSTOKEN = '';
 config.TWITTERACCESSTOKENSECRET = '';
 
 config.DEFAULTSKIN = 0;
+config.MAXSKINVALUE = 8;  // Possible skin values 0-8 until we get > 100 DJ Points
+config.MYNAME = 'mynamehere';
+
+config.ENABLERULES = 0;  // Enable telling channel members we haven't seen before what the rules are.
+config.CHANNELRULES = ''
+
+// http://bitly.com/a/your_api_key/
+config.BITLYUSER = '';
+config.BITLYAPIKEY = '';
 
 exports.config = config;
